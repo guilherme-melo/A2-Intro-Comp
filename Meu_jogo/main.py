@@ -111,7 +111,7 @@ class Jogo:
             
 
 class Bola(ElementoSprite):
-    def __init__(self, position, speed=[0,1], image='virus.png', new_size=[20,20]):
+    def __init__(self, position, speed, image='virus.png', new_size=[20,20]):
         super().__init__(image, position, speed, new_size)
         self.position = position
         
