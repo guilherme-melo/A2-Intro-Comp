@@ -20,8 +20,14 @@ class Jogo:
         self.screen_size = self.screen.get_size()
         pygame.mouse.set_visible(0)
         self.run = True
+        
+        #Distância vertical entre as barreiras
         self.gap=150
+        
+        #Tamanho do buraco entre as barreiras (horizontal)
         self.abertura=100
+        
+        #Velocidade padrão da bolinha
         self.velocidade_padrão=[0,1]
         
     def atualiza_elementos(self, dt):
@@ -31,12 +37,25 @@ class Jogo:
             
     def contato(self, jogador, barreira):
         hitted = pygame.sprite.groupcollide(jogador, barreira, 0, 0)
-        for i in jogador:         
+        for i in jogador:  
+            
+            #Se tiver contato bolinha começa a subir
             if i in hitted:   
                 b=hitted[i][0]
                 sb=b.get_speed()
-                i.speed_down(sb[1])
                 
+                #Condições pra não ficar grudado
+                if (i.rect.bottom <= b.rect.top + 2):                    
+                    i.speed_down(sb[1])
+                elif i.rect.bottom==self.screen_size[1]:
+                    i.speed_down(sb[1])
+                    i.rect.bottom = b.rect.top+1
+                    
+                #Aqui corrige o bug de atravessar pela lateral, porém tira o efeito do seta
+                elif (i.rect.right >= b.rect.left) or (i.rect.left<=b.rect.right):
+                    i.speed_left(0)
+            
+            #Faz a bola voltar a cair
             else:
                 i.speed_down(self.velocidade_padrão[1])
   
@@ -77,12 +96,15 @@ class Jogo:
         turnos = int(turnos)
         
         auxiliar = 2*(self.screen_size[0]-self.abertura)
-             
+        
+        #Randomiza a posição do buraco
         r = rd.randint(0, auxiliar)
-                        
+        
+        #Cria a bola                
         self.jogador=Bola([self.screen_size[0]/2, 20], speed= self.velocidade_padrão)
         self.elementos['jogador'] = pygame.sprite.RenderPlain(self.jogador)
         
+        #Cria as primeiras plataformas (esquerda e direita)
         self.elementos['plataformas'] = pygame.sprite.RenderPlain(Plataforma([0, self.screen_size[1]], new_size=[r,10]))
         self.elementos['plataformas'].add(pygame.sprite.RenderPlain(Plataforma([self.screen_size[0], self.screen_size[1]], new_size=[auxiliar-r,10])))
             
@@ -93,6 +115,7 @@ class Jogo:
             contador+=1
             
             if contador==self.gap:
+                #Cria as outra plataformas
                 r = rd.randint(0, auxiliar)
                 self.elementos['plataformas'].add(pygame.sprite.RenderPlain(Plataforma([0, self.screen_size[1]], new_size=[r,10])))
                 self.elementos['plataformas'].add(pygame.sprite.RenderPlain(Plataforma([self.screen_size[0], self.screen_size[1]], new_size=[auxiliar-r,10])))
@@ -109,11 +132,15 @@ class Jogo:
             self.desenha_elementos()
             pygame.display.flip()
             
+            if self.jogador.morto:
+                self.run=False
+            
 
 class Bola(ElementoSprite):
     def __init__(self, position, speed, image='virus.png', new_size=[20,20]):
         super().__init__(image, position, speed, new_size)
         self.position = position
+        self.morto = False
         
     def get_speed(self):
         return self.speed
@@ -149,7 +176,7 @@ class Bola(ElementoSprite):
             self.rect.bottom = self.area.bottom
 
         elif (self.rect.top < 0):
-            self.rect.top = 0
+            self.morto = True
         
 class Plataforma(ElementoSprite):
     def __init__(self, position, speed=[0,-1], image='vermelho.png', new_size=[500,10]):
