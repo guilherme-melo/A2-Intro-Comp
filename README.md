@@ -1,2 +1,2 @@
-# A2-Intro-Comp
-Trabalho de A2 Introdução a Computação 
+# Introdução à Computação
+Trabalho desenvolvido por Guilherme Melo, Luca Escopelli, Janaina Neres e Felipe Lamarca para a Avaliação 2 da disciplina de Introdução à Computação, ofertada às graduações em Matemática Aplicada e Ciência de Dados da Escola de Matemática Aplicada (FGV/EMAp). Trata-se do desenvolvimento de um jogo utilizando a biblioteca Pygame.
