@@ -22,11 +22,24 @@ class Jogo:
         self.run = True
         self.gap=150
         self.abertura=100
+        self.velocidade_padrão=[0,1]
         
     def atualiza_elementos(self, dt):
         self.fundo.update(dt)
         for v in self.elementos.values():
             v.update(dt)
+            
+    def contato(self, jogador, barreira):
+        hitted = pygame.sprite.groupcollide(jogador, barreira, 0, 0)
+        for i in jogador:         
+            if i in hitted:   
+                b=hitted[i][0]
+                sb=b.get_speed()
+                i.speed_down(sb[1])
+                
+            else:
+                i.speed_down(self.velocidade_padrão[1])
+  
         
     def trata_eventos(self):
         event = pygame.event.poll()
@@ -67,7 +80,7 @@ class Jogo:
              
         r = rd.randint(0, auxiliar)
                         
-        self.jogador=Bola([self.screen_size[0]/2, 20])
+        self.jogador=Bola([self.screen_size[0]/2, 20], speed= self.velocidade_padrão)
         self.elementos['jogador'] = pygame.sprite.RenderPlain(self.jogador)
         
         self.elementos['plataformas'] = pygame.sprite.RenderPlain(Plataforma([0, self.screen_size[1]], new_size=[r,10]))
@@ -87,6 +100,7 @@ class Jogo:
             
 
             self.trata_eventos()
+            self.contato(self.elementos['jogador'], self.elementos['plataformas'])
 
             # Atualiza Elementos
             self.atualiza_elementos(dt)
@@ -100,6 +114,9 @@ class Bola(ElementoSprite):
     def __init__(self, position, speed=[0,1], image='virus.png', new_size=[20,20]):
         super().__init__(image, position, speed, new_size)
         self.position = position
+        
+    def get_speed(self):
+        return self.speed
         
     def speed_up(self, value):
         speed = self.get_speed()
@@ -137,6 +154,9 @@ class Bola(ElementoSprite):
 class Plataforma(ElementoSprite):
     def __init__(self, position, speed=[0,-1], image='vermelho.png', new_size=[500,10]):
         super().__init__(image, position, speed, new_size)
+        
+    def get_speed(self):
+        return self.speed
 
 
 if __name__ == '__main__':
