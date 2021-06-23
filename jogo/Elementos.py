@@ -19,6 +19,7 @@ class ElementoSprite(pygame.sprite.Sprite):
                 for i in range(3):
                     for j in range(3):
                         img = self.image.subsurface((i*715,j*715),(715,715))
+                        img = pygame.transform.scale(img,[50,50])
                         self.sprite_lista.append(img)
                 self.image = self.sprite_lista[self.index_lista]
             else:
